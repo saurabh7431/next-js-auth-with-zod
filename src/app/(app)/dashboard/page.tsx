@@ -15,7 +15,6 @@ import { useSession } from 'next-auth/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AcceptMessagesSchema } from '@/schemas/acceptMessageSchema';
-import { log } from 'node:console';
 
 
 function UserDashboard() {
@@ -188,7 +187,7 @@ function UserDashboard() {
       </Button>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
         {messages.length > 0 ? (
-          messages.map((message, index) => (
+          messages.map((message) => (
             <MessageCard
             key={String(message._id)} 
               message={message}

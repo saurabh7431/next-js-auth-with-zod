@@ -24,7 +24,7 @@ import { APIResponse } from '@/types/ApiResponse';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { messagechema } from '@/schemas/messageSchema';
-import { log } from 'console';
+
 
 const specialChar = '||';
 

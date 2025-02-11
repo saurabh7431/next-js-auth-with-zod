@@ -5,6 +5,7 @@ import UserModels from "@/models/User";
 import { User } from "next-auth";
 import mongoose from "mongoose";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function GET(request: Request) {
     await dbConnect();
     const session = await getServerSession(authOptions);
@@ -48,3 +49,4 @@ export async function GET(request: Request) {
       );
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any

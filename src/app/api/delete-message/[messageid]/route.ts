@@ -3,8 +3,6 @@ import UserModels from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import dbConnect from '@/lib/db.connect';
 import { User } from 'next-auth';
-import { Message } from '@/models/User';
-import { NextRequest } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/options';
 
 export async function DELETE(
