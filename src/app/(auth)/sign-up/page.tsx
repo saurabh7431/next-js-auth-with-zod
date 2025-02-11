@@ -82,7 +82,7 @@ export default function SignUpForm() {
     } catch (error) {
       console.error('Error during sign-up:', error);
 
-      const axiosError = error as AxiosError<APIResponse>;
+      // const axiosError = error as AxiosError<APIResponse>;
 
       // Default error message
       // let errorMessage = axiosError.response?.data.message;
