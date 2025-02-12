@@ -13,6 +13,11 @@ export async function POST(req: Request) {
     const result= await model.generateContent(prompts)
     const response= await result.response;
     const prompt= await response.text();
+    if(!prompt){
+      console.error('Generated prompt is empty');
+      return new Response(JSON.stringify({ error: "Failed to generate prompt" }), { status: 500 });
+    }
+    
       return Response.json({success:true, prompt}, {status:200})
 
   } catch (error) {

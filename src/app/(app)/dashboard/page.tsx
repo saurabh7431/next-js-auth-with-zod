@@ -44,7 +44,7 @@ function UserDashboard() {
     setIsSwitchLoading(true);
     try {
       const response = await axios.get<APIResponse>('/api/get-messages');
-      console.log("response in fetchAcceptMessages", response)
+      console.log("response in fetchAcceptMessages")
       setValue('acceptMessages', response.data.isAcceptingMessages);
     } catch (error) {
       const axiosError = error as AxiosError<APIResponse>;
@@ -98,11 +98,13 @@ function UserDashboard() {
     fetchMessages();
 
     fetchAcceptMessages();
-  }, [session, setValue,  fetchAcceptMessages, fetchMessages]);
+  }, [session, setValue,  fetchAcceptMessages,  fetchMessages]);
   
 
   // Handle switch change
   const handleSwitchChange = async () => {
+    console.log("🚀 ~ handleSwitchChange ~ handleSwitchChange:" )
+    
     try {
       const response = await axios.post<APIResponse>('/api/accept-message', {
         acceptMessages: !acceptMessages,

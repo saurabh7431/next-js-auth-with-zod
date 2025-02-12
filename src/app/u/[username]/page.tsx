@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -24,6 +24,7 @@ import { APIResponse } from '@/types/ApiResponse';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { messagechema } from '@/schemas/messageSchema';
+import { error } from 'console';
 
 
 const specialChar = '||';
@@ -52,14 +53,15 @@ export default function SendMessage() {
   const form = useForm<z.infer<typeof messagechema>>({
     resolver: zodResolver(messagechema),
   });
-// console.log(api)
   const messageContent = form.watch('content');
 
   const handleMessageClick = (message: string) => {
     form.setValue('content', message);
   };
 
+  //useStates defined
   const [isLoading, setIsLoading] = useState(false);
+  const [fetchSuggestedMessage,setFetchSuggestedMessage]=useState("")
 
   const onSubmit = async (data: z.infer<typeof messagechema>) => {
     setIsLoading(true);
@@ -88,19 +90,46 @@ export default function SendMessage() {
   };
 
 
-
+//Fetch Suggest message
   const fetchSuggestedMessages = async () => {
+    setIsLoading(true)
     try {
-      
-       await complete("")
+  
+      // Directly call the backend API to fetch the prompt for testing
+      const response = await fetch('/api/suggest-messages', {
+        method: 'POST',  // Ensure it's a POST request
+      });
+  
+      // Check if the response is OK and handle the data
+      if (response.ok) {
+        const data = await response.json();  // Parse JSON response
+  
+        // Ensure the prompt exists and is a string before calling complete
+        if (data && data.success && typeof data.prompt === 'string') {
+  
+          // Now, calling complete with the correct string prompt
+          const prompt = data.prompt;  // This should be a string with messages separated by ||
+          setFetchSuggestedMessage(prompt)
+  
+        } else {
+          console.error("Unexpected response format from API:", data);
+        }
+      } else {
+        console.error("Failed to fetch messages. Response status:", response.status);
+      }
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      // Handle error appropriately
+      console.error("Error fetching messages:", error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch suggested messages.',
+        variant: 'destructive',
+      });
+    }finally {
+      setIsLoading(false);
     }
   };
-
-// console.log("error.message", error)
   
+
 
 
   return (
@@ -147,7 +176,7 @@ export default function SendMessage() {
           <Button
             onClick={fetchSuggestedMessages}
             className="my-4"
-            disabled={isSuggestLoading}
+            disabled={isLoading}
           >
             Suggest Messages
           </Button>
@@ -157,27 +186,33 @@ export default function SendMessage() {
           <CardHeader>
             <h3 className="text-xl font-semibold">Messages</h3>
           </CardHeader>
-          <CardContent className="flex flex-col space-y-4">
-            
-  {error ? (
-    <p className="text-red-500">{error.message}</p>
-  ) : (
-    parseStringMessages(completion).map((message, index) => {
-      // Add console log here to track the message and index
-      // console.log(`Message ${index + 1}:`, message);
-      return (
-        <Button
-          key={index}
-          variant="outline"
-          className="mb-2"
-          onClick={() => handleMessageClick(message)}
-        >
-          {message}
-        </Button>
-      );
-    })
-  )}
-</CardContent>
+
+    <CardContent className="flex flex-col space-y-4">
+        {error ? (
+          <p className="text-red-500">{error.message}</p>
+        ) : (
+          // Display completion messages initially or fetched ones when they are ready
+          <div className="flex flex-col space-y-4">
+            {(fetchSuggestedMessage ? fetchSuggestedMessage : completion) ? (
+              parseStringMessages(fetchSuggestedMessage || completion).map((message, index) => {
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="mb-2"
+                    onClick={() => handleMessageClick(message)} // Handle click if needed
+                  >
+                    {message}
+                  </Button>
+                );
+              })
+            ) : (
+              <p>No suggested messages available</p>
+            )}
+          </div>
+        )}
+      </CardContent>
+
 
         </Card>
       </div>
