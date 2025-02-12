@@ -9,13 +9,8 @@ export async function sendVerificationEmail(
     verifyCode:string): Promise<APIResponse> {
         try {
         //    const sendEmail= 
-<<<<<<< HEAD
-           await resend.emails.send({
-                from:'auth.blogforyou.in',
-=======
           await resend.emails.send({
                 from:'verification@auth.blogforyou.in',
->>>>>>> 862f749 (added Resend domain)
                 to: email,
                 subject: 'Verification Code',
                 react: VerificationEmail({username, otp: verifyCode})
