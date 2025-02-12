@@ -29,7 +29,6 @@ function UserDashboard() {
   };
 
   const { data: session } = useSession();
-  // console.log("session", session)
 
   
 
@@ -44,8 +43,17 @@ function UserDashboard() {
     setIsSwitchLoading(true);
     try {
       const response = await axios.get<APIResponse>('/api/get-messages');
+      
+      if (response.data.message === "noMessages") {
+        toast({
+          title: 'No Messages found',
+          description: 'No messages found in your inbox',
+          variant: 'custom',
+        });
+      }else {
       console.log("response in fetchAcceptMessages")
       setValue('acceptMessages', response.data.isAcceptingMessages);
+      }
     } catch (error) {
       const axiosError = error as AxiosError<APIResponse>;
       toast({
@@ -66,6 +74,7 @@ function UserDashboard() {
       setIsSwitchLoading(false);
       try {
         const response = await axios.get<APIResponse>('/api/get-messages');
+        // console.log("��� ~ fetchMessages ~ response:", response)
         setMessages(response.data.messages || []);
         if (refresh) {
           toast({
@@ -101,14 +110,15 @@ function UserDashboard() {
   }, [session, setValue,  fetchAcceptMessages,  fetchMessages]);
   
 
-  // Handle switch change
+  //Handle switch change
   const handleSwitchChange = async () => {
-    console.log("🚀 ~ handleSwitchChange ~ handleSwitchChange:" )
-    
+    setIsLoading(true)
     try {
       const response = await axios.post<APIResponse>('/api/accept-message', {
         acceptMessages: !acceptMessages,
       });
+      console.log("🚀 ~ handleSwitchChange ~ response:", response)
+      
       setValue('acceptMessages', !acceptMessages);
       toast({
         title: response.data.message,
@@ -123,8 +133,11 @@ function UserDashboard() {
           'Failed to update message settings',
         variant: 'destructive',
       });
+    }finally{
+      setIsLoading(false)
     }
   };
+
 
   if (!session || !session.user) {
     return <div></div>;
@@ -144,9 +157,8 @@ function UserDashboard() {
   };
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
+    <div className=" md:mx-auto lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
       <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
-
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Copy Your Unique Link</h2>{' '}
         <div className="flex items-center">

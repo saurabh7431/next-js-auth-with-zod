@@ -18,7 +18,11 @@ const VerifyAccount = () => {
     const {toast}=useToast()
 
     const form = useForm<z.infer<typeof verifySchema>>({
-        resolver: zodResolver(verifySchema)});
+        resolver: zodResolver(verifySchema),
+        defaultValues: {
+          code: '', // initialize 'code' field with an empty string
+        },
+      });
 
         const onSubmit = async (data: z.infer<typeof verifySchema>)=>{
             try {

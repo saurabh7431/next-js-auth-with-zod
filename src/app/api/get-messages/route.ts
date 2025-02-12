@@ -9,9 +9,10 @@ import mongoose from "mongoose";
 export async function GET(request: Request) {
     await dbConnect();
     const session = await getServerSession(authOptions);
+    // console.log("🚀 ~ GET ~ session:", session)
     const user: User = session?.user as User;
-    // console.log("user......", user)
-    // console.log("session......", session)
+    // console.log("🚀 ~ GET ~ user:", user)
+    
   
     if (!session || !user) {
       return Response.json(
@@ -30,8 +31,8 @@ export async function GET(request: Request) {
   
       if (!user || user.length === 0) {
         return Response.json(
-          { message: 'User not found', success: false },
-          { status: 404 }
+          { message: 'noMessages', success: true },
+          { status: 200 }
         );
       }
   
