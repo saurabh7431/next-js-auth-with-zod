@@ -1,33 +1,33 @@
-'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import {useDebounceCallback} from 'usehooks-ts'
-import * as z from 'zod';
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDebounceCallback } from "usehooks-ts";
+import * as z from "zod";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from "@/hooks/use-toast";
 
-import axios, { AxiosError } from 'axios';
-import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { signUpSchema } from '@/schemas/signUpSchema';
-import { APIResponse } from '@/types/ApiResponse';
+import axios, { AxiosError } from "axios";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signUpSchema } from "@/schemas/signUpSchema";
+import { APIResponse } from "@/types/ApiResponse";
 
 //main component
 export default function SignUpForm() {
-  const [username, setUsername] = useState('');
-  const [usernameMessage, setUsernameMessage] = useState('');
+  const [username, setUsername] = useState("");
+  const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const debounced = useDebounceCallback(setUsername, 300);
@@ -38,9 +38,9 @@ export default function SignUpForm() {
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      username: '',
-      email: '',
-      password: '',
+      username: "",
+      email: "",
+      password: "",
     },
   });
 
@@ -48,15 +48,17 @@ export default function SignUpForm() {
     const checkUsernameUnique = async () => {
       if (username) {
         setIsCheckingUsername(true);
-        setUsernameMessage(''); // Reset message
+        setUsernameMessage(""); // Reset message
         try {
-          const response = await axios.get<APIResponse>(`/api/check-username-unique?username=${username}`);
+          const response = await axios.get<APIResponse>(
+            `/api/check-username-unique?username=${username}`
+          );
 
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError<APIResponse>;
           setUsernameMessage(
-            axiosError.response?.data.message ?? 'Error checking username'
+            axiosError.response?.data.message ?? "Error checking username"
           );
         } finally {
           setIsCheckingUsername(false);
@@ -69,10 +71,10 @@ export default function SignUpForm() {
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.post<APIResponse>('/api/sign-up', data);
+      const response = await axios.post<APIResponse>("/api/sign-up", data);
 
       toast({
-        title: 'Success',
+        title: "Success",
         description: response.data.message,
       });
 
@@ -80,20 +82,20 @@ export default function SignUpForm() {
 
       setIsSubmitting(false);
     } catch (error) {
-      console.error('Error during sign-up:', error);
+      console.error("Error during sign-up:", error);
 
-      // const axiosError = error as AxiosError<APIResponse>;
+      const axiosError = error as AxiosError<APIResponse>;
 
       // Default error message
-      // let errorMessage = axiosError.response?.data.message;
-      // ('There was a problem with your sign-up. Please try again.');
+      let errorMessage = axiosError.response?.data.message;
+      ("There was a problem with your sign-up. Please try again.");
 
       toast({
-        title: 'Sign Up Failed',
-        description: "There was a problem with your sign-up. Please try again.",
-        variant: 'destructive',
+        title: "Sign Up Failed",
+        description: errorMessage,
+        variant: "destructive",
       });
-
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -103,7 +105,7 @@ export default function SignUpForm() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join True Feedback
+            Join  Honest Feedback
           </h1>
           <p className="mb-4">Sign up to start your anonymous adventure</p>
         </div>
@@ -116,7 +118,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <Input
-                    placeholder='username'
+                    placeholder="username"
                     {...field}
                     onChange={(e) => {
                       field.onChange(e);
@@ -126,7 +128,10 @@ export default function SignUpForm() {
                   {isCheckingUsername && <Loader2 className="animate-spin" />}
                   {!isCheckingUsername && usernameMessage && (
                     <p
-                      className={`text-sm ${usernameMessage === 'Uername is available' ? 'text-blue-400' : 'text-red-500'
+                      className={`text-sm ${
+                        usernameMessage === "Uername is available"
+                          ? "text-blue-400"
+                          : "text-red-500"
                       }`}
                     >
                       {usernameMessage}
@@ -143,7 +148,9 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <Input {...field} name="email" />
-                  <p className='text-muted text-gray-400 text-sm'>We will send you a verification code</p>
+                  <p className="text-muted text-gray-400 text-sm">
+                    We will send you a verification code
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -160,21 +167,22 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className='w-full' disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
-                </>
-              ) : (
-                'Sign Up'
-              )}
-            </Button>
+
+            {isSubmitting ? (
+              <Button type="submit" className="w-full" disabled>
+                <Loader2 className="w-full animate-spin" />
+                Please wait
+              </Button>
+            ) : (
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                Sign Up
+              </Button>
+            )}
           </form>
         </Form>
         <div className="text-center mt-4">
           <p>
-            Already a member?{' '}
+            Already a member?{" "}
             <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
               Sign in
             </Link>

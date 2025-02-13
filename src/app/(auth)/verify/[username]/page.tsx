@@ -7,12 +7,14 @@ import { verifySchema } from '@/schemas/verifySchema';
 import { APIResponse } from '@/types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
+import { Loader2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 const VerifyAccount = () => {
+  const [isLoading, setIsLoading] = useState(false);
     const router =useRouter();
     const params=useParams<{username:string}>()
     const {toast}=useToast()
@@ -26,6 +28,7 @@ const VerifyAccount = () => {
 
         const onSubmit = async (data: z.infer<typeof verifySchema>)=>{
             try {
+              setIsLoading(true);
                 const response= await axios.post(`/api/verify-code`, {
                     username:params.username,
                     code:data.code
@@ -45,6 +48,8 @@ const VerifyAccount = () => {
                         description: axiosError.response?.data.message,
                         variant: 'destructive',
                       });
+            }finally{
+              setIsLoading(false);
             }
         }
 
@@ -70,7 +75,15 @@ const VerifyAccount = () => {
               </FormItem>
             )}
           />
+          {isLoading ?(
+            <Button disabled>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Verifying...
+            </Button>
+          ):(
+
           <Button type="submit">Verify</Button>
+          )}
         </form>
       </Form>
     </div>

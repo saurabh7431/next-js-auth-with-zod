@@ -61,6 +61,7 @@ export default function SendMessage() {
 
   //useStates defined
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchLoading, setIsFetchLoading] = useState(false);
   const [fetchSuggestedMessage,setFetchSuggestedMessage]=useState("")
 
   const onSubmit = async (data: z.infer<typeof messagechema>) => {
@@ -92,7 +93,7 @@ export default function SendMessage() {
 
 //Fetch Suggest message
   const fetchSuggestedMessages = async () => {
-    setIsLoading(true)
+    setIsFetchLoading(true)
     try {
   
       // Directly call the backend API to fetch the prompt for testing
@@ -125,7 +126,7 @@ export default function SendMessage() {
         variant: 'destructive',
       });
     }finally {
-      setIsLoading(false);
+      setIsFetchLoading(false);
     }
   };
   
@@ -173,13 +174,26 @@ export default function SendMessage() {
 
       <div className="space-y-4 my-8">
         <div className="space-y-2">
-          <Button
+
+        {isFetchLoading ? (
+              <Button disabled>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait...
+              </Button>
+            ) : (
+              <Button type="submit" onClick={fetchSuggestedMessages} >
+                Suggest Messages
+              </Button>
+            )}
+
+
+          {/* <Button
             onClick={fetchSuggestedMessages}
             className="my-4"
             disabled={isLoading}
           >
             Suggest Messages
-          </Button>
+          </Button> */}
           <p>Click on any message below to select it.</p>
         </div>
         <Card>

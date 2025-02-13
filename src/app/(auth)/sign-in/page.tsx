@@ -17,8 +17,11 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
 import { signInSchema } from '@/schemas/signInSchema';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function SignInForm() {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -32,30 +35,41 @@ export default function SignInForm() {
   const { toast } = useToast();
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
+    setIsLoading(true);
     const result = await signIn('credentials', {
       redirect:false,
       identifier: data.identifier,
       password: data.password,
     });
-
-    if (result?.error) {
-      if (result.error === 'CredentialsSignin') {
-        toast({
-          title: 'Login Failed',
-          description: 'Incorrect username or password',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: result.error,
-          variant: 'destructive',
-        });
+    try {
+      if (result?.error) {
+        if (result.error === 'CredentialsSignin') {
+          toast({
+            title: 'Login Failed',
+            description: 'Incorrect username or password',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: result.error,
+            variant: 'destructive',
+          });
+        }
       }
-    }
-
-    if (result?.url) {
-      router.replace('/dashboard');
+  
+      if (result?.url) {
+        router.replace('/dashboard');
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to sign in. Please try again.',
+        variant: 'destructive',
+      });
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -64,7 +78,7 @@ export default function SignInForm() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Welcome Back to True Feedback
+            Welcome Back to Honest Feedback
           </h1>
           <p className="mb-4">Sign in to continue your secret conversations</p>
         </div>
@@ -92,7 +106,14 @@ export default function SignInForm() {
                 </FormItem>
               )}
             />
-            <Button className='w-full' type="submit">Sign In</Button>
+            {isLoading ? (
+              <Button className='w-full' disabled>
+                <Loader2 className='w-full animate-spin' />
+                Please wait
+              </Button>
+            ):(
+              <Button className='w-full' type="submit">Sign In</Button>
+            )}
           </form>
         </Form>
         <div className="text-center mt-4">
